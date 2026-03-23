@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Galería</title>
+    <style>
+        body {
+            background: #1a1a1a;
+            color: white;
+            font-family: monospace;
+            padding: 20px;
+        }
+        .log {
+            background: #0a0a0a;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 3px solid #d4af37;
+        }
+        img {
+            max-width: 200px;
+            border: 2px solid #d4af37;
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test de Galería</h1>
+    <div id="log"></div>
+    <div id="images"></div>
+
+    <script>
+        const log = document.getElementById('log');
+        const imagesDiv = document.getElementById('images');
+
+        function addLog(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.className = 'log';
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            div.style.color = type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : '#ffffff';
+            log.appendChild(div);
+            console.log(msg);
+        }
+
+        addLog('🚀 Iniciando test...');
+        addLog('📍 URL actual: ' + window.location.href);
+
+        // Test 1: Cargar JSON
+        addLog('📂 Cargando gallery-data.json...');
+        fetch('assets/gallery/gallery-data.json')
+            .then(response => {
+                addLog('✅ Response recibido: ' + response.status, 'success');
+                return response.json();
+            })
+            .then(data => {
+                addLog('✅ JSON parseado: ' + data.length + ' imágenes', 'success');
+
+                // Test 2: Cargar primera imagen
+                if (data.length > 0) {
+                    const firstImage = data[0];
+                    addLog('🖼️ Cargando primera imagen: ' + firstImage.thumb);
+
+                    const img = document.createElement('img');
+                    img.src = firstImage.thumb;
+                    img.onload = () => {
+                        addLog('✅ Imagen cargada correctamente', 'success');
+                    };
+                    img.onerror = () => {
+                        addLog('❌ Error al cargar imagen', 'error');
+                    };
+                    imagesDiv.appendChild(img);
+
+                    // Cargar 3 imágenes más
+                    for (let i = 1; i < Math.min(4, data.length); i++) {
+                        const img2 = document.createElement('img');
+                        img2.src = data[i].thumb;
+                        imagesDiv.appendChild(img2);
+                    }
+                }
+            })
+            .catch(error => {
+                addLog('❌ ERROR: ' + error.message, 'error');
+                addLog('❌ Error completo: ' + error.stack, 'error');
+            });
+    </script>
+</body>
+</html>

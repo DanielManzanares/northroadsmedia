@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería - North Roads Media</title>
+    <link rel="icon" type="image/x-icon" href="assets/logos/favicon.ico">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/logos/favicon.png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/gallery.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;900&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html#inicio">
+                    <img src="assets/logos/logo-navbar.png" alt="North Roads Media" class="logo-img">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html#inicio">INICIO</a></li>
+                <li><a href="index.html#showreel">SHOWREEL</a></li>
+                <li><a href="galeria.html" class="active">GALERÍA</a></li>
+                <li><a href="index.html#servicios">SERVICIOS</a></li>
+                <li><a href="index.html#precios">PRECIOS</a></li>
+                <li><a href="index.html#contacto">CONTACTO</a></li>
+            </ul>
+            <div class="burger">
+                <div class="line1"></div>
+                <div class="line2"></div>
+                <div class="line3"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Gallery Hero -->
+    <section class="gallery-hero">
+        <div class="container">
+            <h1 class="gallery-hero-title">GALERÍA</h1>
+            <p class="gallery-hero-subtitle">Explora nuestros mejores trabajos en automoción, deportes y eventos</p>
+        </div>
+    </section>
+
+    <!-- Gallery Filters -->
+    <section class="gallery-section">
+        <div class="container">
+            <div class="gallery-filters">
+                <button class="gallery-filter-btn active" data-filter="automocion">AUTOMOCIÓN</button>
+                <button class="gallery-filter-btn" data-filter="deportes">DEPORTES</button>
+                <button class="gallery-filter-btn" data-filter="eventos">EVENTOS</button>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="gallery-grid" id="galleryGrid">
+                <!-- Las imágenes se cargarán dinámicamente aquí -->
+            </div>
+
+            <div class="gallery-loading" id="galleryLoading">
+                <div class="loading-spinner"></div>
+                <p>Cargando galería...</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-overlay" id="lightboxOverlay"></div>
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightboxClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+
+            <button class="lightbox-prev" id="lightboxPrev">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+
+            <div class="lightbox-image-container">
+                <img id="lightboxImage" src="" alt="">
+                <div class="lightbox-caption" id="lightboxCaption"></div>
+            </div>
+
+            <button class="lightbox-next" id="lightboxNext">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="assets/logos/logo-navbar.png" alt="North Roads Media" class="footer-logo-img">
+                    <p>16 años creando sueños</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html#inicio">Inicio</a>
+                    <a href="index.html#showreel">Showreel</a>
+                    <a href="galeria.html">Galería</a>
+                    <a href="index.html#servicios">Servicios</a>
+                    <a href="index.html#contacto">Contacto</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 North Roads Media. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Solo navegación para galería
+        const burger = document.querySelector('.burger');
+        const navLinks = document.querySelector('.nav-links');
+
+        if (burger && navLinks) {
+            burger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                burger.classList.toggle('toggle');
+            });
+        }
+    </script>
+    <script src="assets/js/gallery.js"></script>
+</body>
+</html>
