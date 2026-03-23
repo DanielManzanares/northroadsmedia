@@ -39,7 +39,7 @@ window.addEventListener('scroll', () => {
 });
 
 // ===========================
-// VIDEO MODAL - HTML5 Local Videos
+// VIDEO MODAL - YouTube Embeds + HTML5 Local Videos
 // ===========================
 const videoThumbnails = document.querySelectorAll('.video-thumbnail-link');
 const videoModal = document.getElementById('videoModal');
@@ -51,59 +51,83 @@ if (videoThumbnails && videoModal) {
     videoThumbnails.forEach(thumbnail => {
         thumbnail.addEventListener('click', function(e) {
             e.preventDefault();
+            const youtubeId = this.getAttribute('data-youtube-id');
             const videoSrc = this.getAttribute('data-video-src');
-            if (videoSrc) {
-                openVideoModal(videoSrc);
+
+            if (youtubeId) {
+                openVideoModal(youtubeId, 'youtube');
+            } else if (videoSrc) {
+                openVideoModal(videoSrc, 'local');
             }
         });
     });
 }
 
-function openVideoModal(videoSrc) {
-    console.log('Abriendo video local:', videoSrc);
+function openVideoModal(videoSource, type) {
+    if (type === 'youtube') {
+        console.log('Abriendo video de YouTube:', videoSource);
 
-    // Crear elemento video HTML5
-    const video = document.createElement('video');
-    video.setAttribute('controls', '');
-    video.setAttribute('autoplay', '');
-    video.setAttribute('preload', 'metadata');
-    video.style.width = '100%';
-    video.style.height = '100%';
-    video.style.position = 'absolute';
-    video.style.top = '0';
-    video.style.left = '0';
-    video.style.objectFit = 'contain';
-    video.style.backgroundColor = '#000';
+        // Crear iframe de YouTube
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('src', `https://www.youtube.com/embed/${videoSource}?autoplay=1&rel=0`);
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+        iframe.style.position = 'absolute';
+        iframe.style.top = '0';
+        iframe.style.left = '0';
 
-    // Crear source
-    const source = document.createElement('source');
-    source.setAttribute('src', videoSrc);
-    source.setAttribute('type', 'video/mp4');
+        // Limpiar y añadir iframe
+        videoModalPlayer.innerHTML = '';
+        videoModalPlayer.appendChild(iframe);
 
-    video.appendChild(source);
+    } else if (type === 'local') {
+        console.log('Abriendo video local:', videoSource);
 
-    // Limpiar y añadir video
-    videoModalPlayer.innerHTML = '';
-    videoModalPlayer.appendChild(video);
+        // Crear elemento video HTML5
+        const video = document.createElement('video');
+        video.setAttribute('controls', '');
+        video.setAttribute('autoplay', '');
+        video.setAttribute('preload', 'metadata');
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.position = 'absolute';
+        video.style.top = '0';
+        video.style.left = '0';
+        video.style.objectFit = 'contain';
+        video.style.backgroundColor = '#000';
 
-    // Intentar reproducir
-    video.play().catch(err => {
-        console.error('Error al reproducir:', err);
-        // Si falla, mostrar mensaje
-        video.controls = true;
-    });
+        // Crear source
+        const source = document.createElement('source');
+        source.setAttribute('src', videoSource);
+        source.setAttribute('type', 'video/mp4');
+
+        video.appendChild(source);
+
+        // Limpiar y añadir video
+        videoModalPlayer.innerHTML = '';
+        videoModalPlayer.appendChild(video);
+
+        // Intentar reproducir
+        video.play().catch(err => {
+            console.error('Error al reproducir:', err);
+            video.controls = true;
+        });
+    }
 
     // Mostrar modal
     videoModal.classList.add('active');
     document.body.style.overflow = 'hidden';
 
-    console.log('Modal abierto, video cargando...');
+    console.log('Modal abierto');
 }
 
 function closeVideoModal() {
     console.log('Cerrando modal');
 
-    // Detener y eliminar video
+    // Detener y eliminar video/iframe
     const video = videoModalPlayer.querySelector('video');
     if (video) {
         video.pause();
