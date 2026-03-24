@@ -219,12 +219,30 @@ document.addEventListener('DOMContentLoaded', () => {
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
+        const href = this.getAttribute('href');
+
+        // Ignorar si es solo "#"
+        if (href === '#') return;
+
+        const target = document.querySelector(href);
         if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
+            // Calcular altura del navbar (80px aprox)
+            const navbarHeight = document.querySelector('.navbar').offsetHeight;
+            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
+            const offsetPosition = targetPosition - navbarHeight - 20; // 20px extra de margen
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
             });
+
+            // Cerrar menú móvil si está abierto
+            const navLinks = document.querySelector('.nav-links');
+            const burger = document.querySelector('.burger');
+            if (navLinks.classList.contains('active')) {
+                navLinks.classList.remove('active');
+                burger.classList.remove('toggle');
+            }
         }
     });
 });
