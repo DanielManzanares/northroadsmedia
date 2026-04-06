@@ -1110,7 +1110,9 @@ section {
 }
 
 .footer-bottom {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding-top: 20px;
     border-top: 1px solid rgba(212, 175, 55, 0.1);
 }
@@ -1118,6 +1120,19 @@ section {
 .footer-bottom p {
     color: var(--text-gray);
     font-size: 0.9rem;
+    margin: 0;
+}
+
+.footer-version {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--primary-color);
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+.footer-version:hover {
+    opacity: 1;
 }
 
 /* ===========================
@@ -1334,5 +1349,23 @@ section {
 
     .about-text {
         order: 2;
+    }
+}
+
+/* Footer Responsive */
+@media (max-width: 768px) {
+    .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+
+    .footer-version {
+        order: 2;
+        font-size: 0.8rem;
+    }
+
+    .footer-bottom p:not(.footer-version) {
+        order: 1;
     }
 }
