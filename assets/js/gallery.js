@@ -270,6 +270,12 @@ function openLightbox(index) {
         // Clear previous content
         lightboxVideoContainer.innerHTML = '';
 
+        // Remove previous platform classes
+        lightboxVideoContainer.classList.remove('platform-youtube', 'platform-instagram');
+
+        // Add platform-specific class for aspect ratio
+        lightboxVideoContainer.classList.add(`platform-${video.platform}`);
+
         // Create iframe for video
         const iframe = document.createElement('iframe');
         iframe.setAttribute('allowfullscreen', '');
