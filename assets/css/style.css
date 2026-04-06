@@ -156,12 +156,36 @@ body {
     z-index: 0;
 }
 
-/* Imagen específica para orientación vertical (móvil, tablet, etc) */
+/* Imagen específica para orientación vertical - MÚLTIPLES SELECTORES PARA ASEGURAR */
+/* Nivel 1: Orientación portrait general */
 @media (orientation: portrait) {
+    .hero .hero-background,
+    section#inicio .hero-background,
     .hero-background {
         background-image: url('../images/hero-background-mobile.jpg') !important;
-        background-position: center center;
-        filter: brightness(0.5);
+        background-position: center center !important;
+        filter: brightness(0.5) !important;
+    }
+}
+
+/* Nivel 2: Portrait + Ancho máximo para tablets/móviles */
+@media (max-width: 1024px) and (orientation: portrait) {
+    section.hero .hero-background,
+    .hero > .hero-background {
+        background-image: url('../images/hero-background-mobile.jpg') !important;
+        background-position: center center !important;
+        background-size: cover !important;
+        filter: brightness(0.5) !important;
+    }
+}
+
+/* Nivel 3: Móviles pequeños (independiente de orientación) */
+@media (max-width: 768px) {
+    body .hero .hero-background,
+    #inicio .hero-background {
+        background-image: url('../images/hero-background-mobile.jpg') !important;
+        background-position: center center !important;
+        filter: brightness(0.5) !important;
     }
 }
 
