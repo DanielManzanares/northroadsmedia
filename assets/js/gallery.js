@@ -276,20 +276,30 @@ function openLightbox(index) {
         // Add platform-specific class for aspect ratio
         lightboxVideoContainer.classList.add(`platform-${video.platform}`);
 
-        // Create iframe for video
-        const iframe = document.createElement('iframe');
-        iframe.setAttribute('allowfullscreen', '');
-        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
-
         if (video.platform === 'youtube') {
-            // YouTube embed
+            // YouTube embed with iframe
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('allowfullscreen', '');
+            iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
             iframe.src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`;
+            lightboxVideoContainer.appendChild(iframe);
         } else if (video.platform === 'instagram') {
-            // Instagram embed
-            iframe.src = `https://www.instagram.com/reel/${video.videoId}/embed`;
-        }
+            // Instagram - use local HTML5 video
+            const videoElement = document.createElement('video');
+            videoElement.setAttribute('controls', '');
+            videoElement.setAttribute('autoplay', '');
+            videoElement.setAttribute('playsinline', '');
+            videoElement.style.width = '100%';
+            videoElement.style.height = '100%';
+            videoElement.style.objectFit = 'contain';
 
-        lightboxVideoContainer.appendChild(iframe);
+            const source = document.createElement('source');
+            source.src = `assets/gallery/videos/${video.videoId}.mp4`;
+            source.type = 'video/mp4';
+
+            videoElement.appendChild(source);
+            lightboxVideoContainer.appendChild(videoElement);
+        }
 
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
