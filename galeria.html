@@ -39,9 +39,10 @@
     </nav>
 
     <!-- Gallery Hero -->
-    <section class="gallery-hero">
+    <section class="gallery-hero" style="background-image: url('assets/images/gallery-hero.jpg');">
+        <div class="gallery-hero-overlay"></div>
         <div class="container">
-            <h1 class="gallery-hero-title">GALERÍA</h1>
+            <h1 class="gallery-hero-title">GALERÍA DE VIDEOS</h1>
             <p class="gallery-hero-subtitle">Explora nuestros mejores trabajos en automoción, deportes y eventos</p>
         </div>
     </section>
@@ -49,10 +50,16 @@
     <!-- Gallery Filters -->
     <section class="gallery-section">
         <div class="container">
+            <!-- Filtros principales -->
             <div class="gallery-filters">
                 <button class="gallery-filter-btn active" data-filter="automocion">AUTOMOCIÓN</button>
                 <button class="gallery-filter-btn" data-filter="deportes">DEPORTES</button>
                 <button class="gallery-filter-btn" data-filter="eventos">EVENTOS</button>
+            </div>
+
+            <!-- Sub-filtros (se muestran según categoría) -->
+            <div class="gallery-subfilters" id="gallerySubfilters">
+                <!-- Se llenarán dinámicamente -->
             </div>
 
             <!-- Gallery Grid -->
@@ -67,7 +74,7 @@
         </div>
     </section>
 
-    <!-- Lightbox Modal -->
+    <!-- Video Modal -->
     <div class="lightbox" id="lightbox">
         <div class="lightbox-overlay" id="lightboxOverlay"></div>
         <div class="lightbox-content">
@@ -84,9 +91,8 @@
                 </svg>
             </button>
 
-            <div class="lightbox-image-container">
-                <img id="lightboxImage" src="" alt="">
-                <div class="lightbox-caption" id="lightboxCaption"></div>
+            <div class="lightbox-video-container" id="lightboxVideoContainer">
+                <!-- El video se cargará dinámicamente aquí -->
             </div>
 
             <button class="lightbox-next" id="lightboxNext">

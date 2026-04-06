@@ -1,32 +1,50 @@
 // ===========================
-// GALLERY SYSTEM - SIMPLIFIED
+// VIDEO GALLERY SYSTEM
 // ===========================
 
-let galleryImages = [];
-let currentImageIndex = 0;
+let galleryVideos = [];
+let currentVideoIndex = 0;
 let currentFilter = 'automocion';
+let currentSubfilter = 'produccion'; // Default subcategory
 let currentPage = 1;
-const imagesPerPage = 20;
+const videosPerPage = 12;
 
 // DOM Elements
 const galleryGrid = document.getElementById('galleryGrid');
 const galleryLoading = document.getElementById('galleryLoading');
 const filterBtns = document.querySelectorAll('.gallery-filter-btn');
+const subfiltersContainer = document.getElementById('gallerySubfilters');
 const lightbox = document.getElementById('lightbox');
-const lightboxImage = document.getElementById('lightboxImage');
-const lightboxCaption = document.getElementById('lightboxCaption');
+const lightboxVideoContainer = document.getElementById('lightboxVideoContainer');
 const lightboxClose = document.getElementById('lightboxClose');
 const lightboxPrev = document.getElementById('lightboxPrev');
 const lightboxNext = document.getElementById('lightboxNext');
 const lightboxOverlay = document.getElementById('lightboxOverlay');
 
-console.log('📸 Gallery JS loaded');
+console.log('🎬 Video Gallery JS loaded');
 
 // ===========================
-// LOAD GALLERY IMAGES
+// SUBCATEGORY CONFIGURATION
 // ===========================
-function loadGalleryImages() {
-    console.log('📂 Loading gallery data...');
+const subcategoryConfig = {
+    'automocion': [
+        { value: 'produccion', label: 'PRODUCCIÓN/TALLER' },
+        { value: 'sesiones', label: 'SESIONES/PROFILES' }
+    ],
+    'deportes': [
+        { value: 'deportes', label: 'DEPORTES' },
+        { value: 'motorsport', label: 'MOTORSPORT' }
+    ],
+    'eventos': [
+        { value: 'eventos', label: 'EVENTOS' }
+    ]
+};
+
+// ===========================
+// LOAD GALLERY VIDEOS
+// ===========================
+function loadGalleryVideos() {
+    console.log('📂 Loading video gallery data...');
 
     fetch('assets/gallery/gallery-data.json')
         .then(response => {
@@ -37,8 +55,9 @@ function loadGalleryImages() {
             return response.json();
         })
         .then(data => {
-            console.log('✅ Data parsed:', data.length, 'images');
-            galleryImages = data;
+            console.log('✅ Data parsed:', data.length, 'videos');
+            galleryVideos = data;
+            renderSubfilters(currentFilter);
             renderGallery();
             if (galleryLoading) {
                 galleryLoading.style.display = 'none';
@@ -53,56 +72,101 @@ function loadGalleryImages() {
 }
 
 // ===========================
+// RENDER SUBFILTERS
+// ===========================
+function renderSubfilters(category) {
+    if (!subfiltersContainer) return;
+
+    const subfilters = subcategoryConfig[category] || [];
+
+    if (subfilters.length === 0) {
+        subfiltersContainer.innerHTML = '';
+        return;
+    }
+
+    subfiltersContainer.innerHTML = subfilters.map((subfilter, index) => `
+        <button class="gallery-subfilter-btn ${index === 0 ? 'active' : ''}"
+                data-subfilter="${subfilter.value}">
+            ${subfilter.label}
+        </button>
+    `).join('');
+
+    // Set default subfilter
+    if (subfilters.length > 0) {
+        currentSubfilter = subfilters[0].value;
+    }
+
+    // Add event listeners to subfilter buttons
+    const subfilterBtns = document.querySelectorAll('.gallery-subfilter-btn');
+    subfilterBtns.forEach(btn => {
+        btn.addEventListener('click', function() {
+            subfilterBtns.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentSubfilter = this.getAttribute('data-subfilter');
+            currentPage = 1;
+            renderGallery();
+        });
+    });
+}
+
+// ===========================
 // RENDER GALLERY
 // ===========================
-function renderGallery(filter = 'automocion', page = 1) {
+function renderGallery(filter = currentFilter, subfilter = currentSubfilter, page = 1) {
     if (!galleryGrid) {
         console.error('❌ galleryGrid element not found');
         return;
     }
 
-    console.log(`🎨 Rendering gallery: filter=${filter}, page=${page}`);
+    console.log(`🎨 Rendering gallery: filter=${filter}, subfilter=${subfilter}, page=${page}`);
     galleryGrid.innerHTML = '';
 
-    const filteredImages = galleryImages.filter(img => img.category === filter);
+    // Filter by category and subcategory
+    const filteredVideos = galleryVideos.filter(video =>
+        video.category === filter && video.subcategory === subfilter
+    );
 
-    console.log(`📊 Filtered images: ${filteredImages.length}`);
+    console.log(`📊 Filtered videos: ${filteredVideos.length}`);
 
-    // Paginación
-    const startIndex = (page - 1) * imagesPerPage;
-    const endIndex = startIndex + imagesPerPage;
-    const imagesToShow = filteredImages.slice(startIndex, endIndex);
+    // Pagination
+    const startIndex = (page - 1) * videosPerPage;
+    const endIndex = startIndex + videosPerPage;
+    const videosToShow = filteredVideos.slice(startIndex, endIndex);
 
-    console.log(`📄 Showing images ${startIndex}-${endIndex}`);
+    console.log(`📄 Showing videos ${startIndex}-${endIndex}`);
 
-    imagesToShow.forEach((image, index) => {
+    videosToShow.forEach((video, index) => {
+        const globalIndex = galleryVideos.findIndex(v => v.id === video.id);
         const item = document.createElement('div');
         item.className = 'gallery-item visible';
-        item.setAttribute('data-category', image.category);
-        item.setAttribute('data-index', startIndex + index);
+        item.setAttribute('data-category', video.category);
+        item.setAttribute('data-subcategory', video.subcategory);
+        item.setAttribute('data-index', globalIndex);
 
         item.innerHTML = `
-            <img src="${image.thumb || image.src}"
-                 alt="${image.alt || image.title}">
+            <img src="${video.thumbnail}"
+                 alt="${video.title}">
             <div class="gallery-item-overlay">
-                <div class="gallery-item-category">${getCategoryName(image.category)}</div>
-                <div class="gallery-item-title">${image.title}</div>
+                <div class="gallery-item-category">${getCategoryName(video.category)}</div>
+                <div class="gallery-item-title">${video.platform.toUpperCase()}</div>
             </div>
         `;
 
         item.addEventListener('click', () => {
-            console.log('🖱️ Clicked image:', startIndex + index);
-            openLightbox(startIndex + index);
+            console.log('🖱️ Clicked video:', globalIndex);
+            openLightbox(globalIndex);
         });
 
         galleryGrid.appendChild(item);
     });
 
-    console.log(`✅ Rendered ${imagesToShow.length} images`);
+    console.log(`✅ Rendered ${videosToShow.length} videos`);
 
-    // Paginación
-    if (filteredImages.length > imagesPerPage) {
-        addPaginationControls(filteredImages.length, page);
+    // Pagination
+    if (filteredVideos.length > videosPerPage) {
+        addPaginationControls(filteredVideos.length, page);
+    } else {
+        removePaginationControls();
     }
 }
 
@@ -113,8 +177,7 @@ function getCategoryName(category) {
     const names = {
         'automocion': 'AUTOMOCIÓN',
         'deportes': 'DEPORTES',
-        'eventos': 'EVENTOS',
-        'promo': 'PROMO'
+        'eventos': 'EVENTOS'
     };
     return names[category] || category.toUpperCase();
 }
@@ -122,8 +185,8 @@ function getCategoryName(category) {
 // ===========================
 // PAGINATION
 // ===========================
-function addPaginationControls(totalImages, currentPage) {
-    const totalPages = Math.ceil(totalImages / imagesPerPage);
+function addPaginationControls(totalVideos, currentPage) {
+    const totalPages = Math.ceil(totalVideos / videosPerPage);
 
     let paginationDiv = document.getElementById('galleryPagination');
     if (!paginationDiv) {
@@ -135,34 +198,41 @@ function addPaginationControls(totalImages, currentPage) {
 
     paginationDiv.innerHTML = '';
 
-    // Botón anterior
+    // Previous button
     if (currentPage > 1) {
         const prevBtn = document.createElement('button');
         prevBtn.className = 'pagination-btn';
         prevBtn.textContent = '← Anterior';
         prevBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            renderGallery(currentFilter, currentPage - 1);
+            renderGallery(currentFilter, currentSubfilter, currentPage - 1);
         });
         paginationDiv.appendChild(prevBtn);
     }
 
-    // Info
+    // Page info
     const pageInfo = document.createElement('span');
     pageInfo.className = 'pagination-info';
     pageInfo.textContent = `Página ${currentPage} de ${totalPages}`;
     paginationDiv.appendChild(pageInfo);
 
-    // Botón siguiente
+    // Next button
     if (currentPage < totalPages) {
         const nextBtn = document.createElement('button');
         nextBtn.className = 'pagination-btn';
         nextBtn.textContent = 'Siguiente →';
         nextBtn.addEventListener('click', () => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            renderGallery(currentFilter, currentPage + 1);
+            renderGallery(currentFilter, currentSubfilter, currentPage + 1);
         });
         paginationDiv.appendChild(nextBtn);
+    }
+}
+
+function removePaginationControls() {
+    const paginationDiv = document.getElementById('galleryPagination');
+    if (paginationDiv) {
+        paginationDiv.remove();
     }
 }
 
@@ -180,23 +250,40 @@ if (filterBtns) {
             const filter = this.getAttribute('data-filter');
             currentFilter = filter;
             currentPage = 1;
-            renderGallery(filter, 1);
+
+            // Update subfilters and render
+            renderSubfilters(filter);
+            renderGallery();
         });
     });
 }
 
 // ===========================
-// LIGHTBOX
+// LIGHTBOX - VIDEO MODAL
 // ===========================
 function openLightbox(index) {
-    console.log('🖼️ Opening lightbox:', index);
-    currentImageIndex = index;
-    const image = galleryImages[index];
+    console.log('🎬 Opening video modal:', index);
+    currentVideoIndex = index;
+    const video = galleryVideos[index];
 
-    if (lightboxImage && lightboxCaption && lightbox) {
-        lightboxImage.src = image.src;
-        lightboxImage.alt = image.alt || image.title;
-        lightboxCaption.textContent = image.title;
+    if (lightboxVideoContainer && lightbox) {
+        // Clear previous content
+        lightboxVideoContainer.innerHTML = '';
+
+        // Create iframe for video
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('allowfullscreen', '');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+
+        if (video.platform === 'youtube') {
+            // YouTube embed
+            iframe.src = `https://www.youtube.com/embed/${video.videoId}?autoplay=1&rel=0`;
+        } else if (video.platform === 'instagram') {
+            // Instagram embed
+            iframe.src = `https://www.instagram.com/reel/${video.videoId}/embed`;
+        }
+
+        lightboxVideoContainer.appendChild(iframe);
 
         lightbox.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -204,31 +291,22 @@ function openLightbox(index) {
 }
 
 function closeLightbox() {
-    console.log('❌ Closing lightbox');
-    if (lightbox) {
+    console.log('❌ Closing video modal');
+    if (lightbox && lightboxVideoContainer) {
         lightbox.classList.remove('active');
+        lightboxVideoContainer.innerHTML = ''; // Stop video
         document.body.style.overflow = 'auto';
     }
 }
 
-function showPrevImage() {
-    currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
-    const image = galleryImages[currentImageIndex];
-    if (lightboxImage && lightboxCaption) {
-        lightboxImage.src = image.src;
-        lightboxImage.alt = image.alt || image.title;
-        lightboxCaption.textContent = image.title;
-    }
+function showPrevVideo() {
+    currentVideoIndex = (currentVideoIndex - 1 + galleryVideos.length) % galleryVideos.length;
+    openLightbox(currentVideoIndex);
 }
 
-function showNextImage() {
-    currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
-    const image = galleryImages[currentImageIndex];
-    if (lightboxImage && lightboxCaption) {
-        lightboxImage.src = image.src;
-        lightboxImage.alt = image.alt || image.title;
-        lightboxCaption.textContent = image.title;
-    }
+function showNextVideo() {
+    currentVideoIndex = (currentVideoIndex + 1) % galleryVideos.length;
+    openLightbox(currentVideoIndex);
 }
 
 // Event Listeners
@@ -241,11 +319,11 @@ if (lightboxOverlay) {
 }
 
 if (lightboxPrev) {
-    lightboxPrev.addEventListener('click', showPrevImage);
+    lightboxPrev.addEventListener('click', showPrevVideo);
 }
 
 if (lightboxNext) {
-    lightboxNext.addEventListener('click', showNextImage);
+    lightboxNext.addEventListener('click', showNextVideo);
 }
 
 // Keyboard
@@ -254,9 +332,9 @@ document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             closeLightbox();
         } else if (e.key === 'ArrowLeft') {
-            showPrevImage();
+            showPrevVideo();
         } else if (e.key === 'ArrowRight') {
-            showNextImage();
+            showNextVideo();
         }
     }
 });
@@ -265,10 +343,63 @@ document.addEventListener('keydown', (e) => {
 // INITIALIZE
 // ===========================
 if (galleryGrid) {
-    console.log('🚀 Initializing gallery...');
-    loadGalleryImages();
+    console.log('🚀 Initializing video gallery...');
+    loadGalleryVideos();
 } else {
     console.error('❌ Gallery grid not found!');
 }
 
-console.log('✅ Gallery system ready');
+console.log('✅ Video gallery system ready');
+
+// ===========================
+// HASH NAVIGATION
+// ===========================
+function loadFromHash() {
+    const hash = window.location.hash.substring(1); // Remove #
+    if (!hash) return;
+
+    console.log('🔗 Loading from hash:', hash);
+
+    // Parse hash: format is "category-subcategory" or just "category"
+    const parts = hash.split('-');
+    const category = parts[0];
+    const subcategory = parts[1] || null;
+
+    if (category && ['automocion', 'deportes', 'eventos'].includes(category)) {
+        currentFilter = category;
+
+        // Activate category button
+        filterBtns.forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.getAttribute('data-filter') === category) {
+                btn.classList.add('active');
+            }
+        });
+
+        // Render subfilters
+        renderSubfilters(category);
+
+        // If subcategory specified, activate it
+        if (subcategory) {
+            currentSubfilter = subcategory;
+            setTimeout(() => {
+                const subfilterBtns = document.querySelectorAll('.gallery-subfilter-btn');
+                subfilterBtns.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-subfilter') === subcategory) {
+                        btn.classList.add('active');
+                    }
+                });
+            }, 100);
+        }
+
+        // Render gallery
+        renderGallery();
+    }
+}
+
+// Call on load if hash exists
+if (window.location.hash) {
+    window.addEventListener('DOMContentLoaded', loadFromHash);
+}
+
