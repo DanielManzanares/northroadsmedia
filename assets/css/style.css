@@ -1277,3 +1277,38 @@ section {
         display: none;
     }
 }
+/* Mundoswap Section - Alternative Background */
+.about-section-alt {
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+}
+
+/* Reverse content order (video left, text right) */
+.about-content-reverse {
+    grid-template-columns: 1.5fr 1fr;
+    direction: ltr;
+}
+
+/* Video styling in about section */
+.about-video video {
+    width: 100%;
+    height: auto;
+    border: 3px solid var(--primary-color);
+    box-shadow: var(--shadow);
+    border-radius: 4px;
+}
+
+/* Responsive adjustments for Mundoswap section */
+@media (max-width: 968px) {
+    .about-content-reverse {
+        grid-template-columns: 1fr;
+        direction: ltr;
+    }
+
+    .about-video {
+        order: 1;
+    }
+
+    .about-text {
+        order: 2;
+    }
+}
