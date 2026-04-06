@@ -156,8 +156,8 @@ body {
     z-index: 0;
 }
 
-/* Imagen específica para móvil vertical */
-@media (max-width: 768px) and (orientation: portrait) {
+/* Imagen específica para orientación vertical (móvil, tablet, etc) */
+@media (orientation: portrait) {
     .hero-background {
         background-image: url('../images/hero-background-mobile.jpg') !important;
         background-position: center center;
